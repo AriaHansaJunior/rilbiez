@@ -1,142 +1,121 @@
 import { ArrowUpRight } from './Icons';
-import { FadeIn, SectionLabel, CONTAINER } from './Shared';
+import { CONTAINER, SectionLabel, Reveal, StaggerGroup, StaggerItem } from './Shared';
 import { copy } from './Copy';
 
-function ProjectVisual() {
-  const dots: React.ReactNode[] = []
-  for (let i = 0; i <= 11; i++) {
-    for (let j = 0; j <= 6; j++) {
-      dots.push(
-        <circle key={`d${i}-${j}`} cx={i * 51} cy={j * 51} r="1.2" fill="#252936" opacity="0.7" />
-      )
-    }
-  }
-
+/**
+ * IndoLensAbstractVisual:
+ * Clean, technical, editorial abstraction. No fake metrics or HUD overlays.
+ */
+function IndoLensAbstractVisual() {
   return (
     <div
-      className="relative w-full h-full overflow-hidden"
-      style={{ background: '#0C0E16', minHeight: 280 }}
+      className="relative w-full h-full min-h-[280px] sm:min-h-[340px] md:min-h-[400px] bg-[#0C0E16] overflow-hidden flex items-center justify-center select-none"
       role="img"
-      aria-label="Abstract computer vision visualization placeholder for IndoLens"
+      aria-label="Abstract representation of IndoLens"
     >
-      <svg
-        className="absolute inset-0 w-full h-full"
-        viewBox="0 0 560 340"
-        preserveAspectRatio="xMidYMid slice"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <defs>
-          <linearGradient id="scanLine" x1="185" y1="170" x2="375" y2="170" gradientUnits="userSpaceOnUse">
-            <stop stopColor="#C84D16" stopOpacity="0" />
-            <stop offset="0.5" stopColor="#C84D16" stopOpacity="0.55" />
-            <stop offset="1" stopColor="#C84D16" stopOpacity="0" />
-          </linearGradient>
-        </defs>
+      <div className="absolute inset-0 flex items-center justify-center">
+        {/* Abstract framing */}
+        <div className="w-[60%] h-[60%] border border-edge/60 rounded-lg opacity-40 flex items-center justify-center relative shadow-[0_0_30px_rgba(200,77,22,0.05)]">
+          {/* Inner focus area */}
+          <div className="w-[70%] h-[70%] border border-accent/20 rounded backdrop-blur-sm bg-accent/5" />
+          
+          {/* Corner accents */}
+          <div className="absolute -top-1 -left-1 w-2 h-2 border-t border-l border-accent/50" />
+          <div className="absolute -top-1 -right-1 w-2 h-2 border-t border-r border-accent/50" />
+          <div className="absolute -bottom-1 -left-1 w-2 h-2 border-b border-l border-accent/50" />
+          <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b border-r border-accent/50" />
+        </div>
+      </div>
 
-        {/* Dot grid */}
-        {dots}
-
-        {/* Main detection frame */}
-        <rect x="185" y="80" width="190" height="170" rx="2" stroke="#C84D16" strokeWidth="0.9" opacity="0.42" />
-        <rect x="177" y="72" width="206" height="186" rx="3" stroke="#C84D16" strokeWidth="0.4" opacity="0.18" />
-
-        {/* Corner bracket marks */}
-        <path d="M185 103 L185 80 L208 80" stroke="#C84D16" strokeWidth="1.5" opacity="0.88" />
-        <path d="M352 103 L352 80 L329 80" stroke="#C84D16" strokeWidth="1.5" opacity="0.88" />
-        <path d="M185 227 L185 250 L208 250" stroke="#C84D16" strokeWidth="1.5" opacity="0.88" />
-        <path d="M352 227 L352 250 L329 250" stroke="#C84D16" strokeWidth="1.5" opacity="0.88" />
-
-        {/* Confidence label */}
-        <rect x="185" y="63" width="104" height="15" rx="1.5" fill="#C84D16" opacity="0.1" />
-        <text x="190" y="74" fontFamily="'JetBrains Mono', monospace" fontSize="9" fill="#C84D16" opacity="0.88">
-          ACTOR: 0.947
-        </text>
-
-        {/* Horizontal scan line */}
-        <line x1="185" y1="165" x2="375" y2="165" stroke="url(#scanLine)" strokeWidth="1.2" />
-
-        {/* Secondary side frames */}
-        <rect x="60" y="100" width="96" height="120" rx="2" stroke="#A3A6B2" strokeWidth="0.5" opacity="0.17" />
-        <rect x="402" y="108" width="82" height="105" rx="2" stroke="#A3A6B2" strokeWidth="0.5" opacity="0.13" />
-
-        {/* Bottom rule and label */}
-        <line x1="20" y1="312" x2="540" y2="312" stroke="#252936" strokeWidth="0.5" opacity="0.5" />
-        <text x="20" y="328" fontFamily="'JetBrains Mono', monospace" fontSize="8.5" fill="#A3A6B2" opacity="0.4">
-          INDOLENS · COMPUTER VISION RECOGNITION SYSTEM
-        </text>
-        <text x="508" y="328" fontFamily="'JetBrains Mono', monospace" fontSize="8.5" fill="#C84D16" opacity="0.5">
-          v1.0
-        </text>
-      </svg>
-
-      {/* Subtle warm overlay */}
+      {/* Atmospheric warm radial overlay */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse at 50% 45%, rgba(200,77,22,0.045) 0%, transparent 65%)' }}
+        style={{ background: 'radial-gradient(circle at 50% 50%, rgba(200,77,22,0.06) 0%, transparent 65%)' }}
       />
     </div>
-  )
+  );
 }
 
 export function ProjectsSection({ c }: { c: (typeof copy)['en'] }) {
   return (
-    <section id="projects" className="py-24 md:py-32 lg:py-36 border-t border-edge">
+    <section
+      id="projects"
+      className="relative py-24 sm:py-32 lg:py-36 border-t border-edge/60"
+      aria-label="Projects"
+    >
       <div className={CONTAINER}>
-        <FadeIn>
+        <Reveal direction="up" distance={20}>
           <SectionLabel>{c.projectsLabel}</SectionLabel>
-        </FadeIn>
+        </Reveal>
 
-        <FadeIn delay={80}>
-          <div
-            className="group border border-edge rounded-xl overflow-hidden transition-all duration-300 hover:border-accent/35 hover:shadow-[0_10px_48px_rgba(200,77,22,0.07)] hover:-translate-y-0.5"
-            style={{ background: '#13151D' }}
-          >
-            <div className="flex flex-col md:flex-row">
-              {/* Visual */}
-              <div className="w-full md:w-[44%] lg:w-[46%] min-h-[260px] md:min-h-[340px] overflow-hidden">
-                <ProjectVisual />
+        {/* IndoLens Showcase Card */}
+        <Reveal direction="up" distance={30} delay={100}>
+          <div className="mt-8 border border-edge rounded-2xl overflow-hidden bg-surface/80 backdrop-blur-sm shadow-2xl transition-all duration-300 hover:border-accent/40">
+            <div className="flex flex-col lg:flex-row">
+
+              {/* Visual Column */}
+              <div className="w-full lg:w-[48%] overflow-hidden border-b lg:border-b-0 lg:border-r border-edge">
+                <IndoLensAbstractVisual />
               </div>
 
-              {/* Content */}
-              <div className="flex-1 p-7 sm:p-9 md:p-10 lg:p-12 flex flex-col justify-between gap-6">
+              {/* Content Column */}
+              <div className="flex-1 p-7 sm:p-10 lg:p-12 flex flex-col justify-between gap-8 z-10">
                 <div>
-                  <span className="inline-block font-mono text-[11px] tracking-[0.12em] text-accent uppercase mb-4">
-                    {c.projectBadge}
-                  </span>
-                  <h3 className="text-fg text-3xl md:text-4xl font-semibold tracking-tight mb-4">
-                    IndoLens
+                  {/* Badge */}
+                  <div className="inline-flex items-center gap-2 mb-4">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                    <span className="font-mono text-[11px] tracking-[0.14em] text-accent uppercase font-medium">
+                      {c.projectBadge}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-fg mb-5">
+                    {c.projectTitle}
                   </h3>
-                  <p className="text-dim text-[15px] md:text-base leading-[1.75] mb-7">
+
+                  {/* Description */}
+                  <p className="text-dim text-[15px] sm:text-base leading-[1.8] mb-8 max-w-xl">
                     {c.projectDesc}
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    {c.projectTags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="font-mono text-[11px] text-dim border border-edge/60 px-2.5 py-1 rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+
+                  {/* Tech Stack Pills (Exact locked list) */}
+                  <div>
+                    <div className="font-mono text-[10px] tracking-widest text-dim/70 uppercase mb-3">
+                      TECH STACK
+                    </div>
+                    <StaggerGroup interval={40} className="flex flex-wrap gap-2">
+                      {c.projectTags.map((tag, i) => (
+                        <StaggerItem key={tag} index={i} direction="none">
+                          <span
+                            className="font-mono text-[11px] text-fg/90 bg-edge/40 border border-edge/80 px-2.5 py-1 rounded hover:border-accent/50 hover:text-accent transition-colors duration-200 cursor-default inline-block"
+                          >
+                            {tag}
+                          </span>
+                        </StaggerItem>
+                      ))}
+                    </StaggerGroup>
                   </div>
                 </div>
 
-                <a
-                  href="https://indolens.webprojek.site/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-fg border border-edge hover:border-accent hover:text-accent px-5 py-2.5 rounded text-[13.5px] font-medium transition-all duration-200 w-fit"
-                >
-                  {c.projectCTA}
-                  <ArrowUpRight size={14} />
-                </a>
+                {/* Direct Clickable CTA Button */}
+                <div className="pt-6">
+                  <a
+                    href={c.projectUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2.5 bg-accent hover:bg-accent-h text-white font-medium text-[13.5px] px-6 py-3.5 rounded-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-lg shadow-accent/20 w-fit"
+                  >
+                    <span>{c.projectCTA}</span>
+                    <ArrowUpRight size={15} />
+                  </a>
+                </div>
               </div>
+
             </div>
           </div>
-        </FadeIn>
+        </Reveal>
       </div>
     </section>
-  )
+  );
 }

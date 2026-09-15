@@ -1,125 +1,140 @@
 import { EmailIcon, GitHubIcon, LinkedInIcon, WhatsAppIcon, MapPinIcon } from './Icons';
-import { FadeIn, SectionLabel, CONTAINER } from './Shared';
+import { CONTAINER, SectionLabel, Reveal, StaggerGroup, StaggerItem } from './Shared';
 import { copy } from './Copy';
 
+/**
+ * ContactSection: "LET'S CONNECT" — Cinematic Climax
+ * Impactful focal typography, progressive staggered card reveals.
+ */
 export function ContactSection({ c }: { c: (typeof copy)['en'] }) {
-  const primary = [
-    {
-      icon: <EmailIcon size={19} />,
-      label: 'Email',
-      display: 'ahjunior200605@gmail.com',
-      href: 'https://mail.google.com/mail/?view=cm&fs=1&to=ahjunior200605@gmail.com',
-      delay: 160,
-    },
-    {
-      icon: <GitHubIcon size={19} />,
-      label: 'GitHub',
-      display: 'AriaHansaJunior',
-      href: 'https://github.com/AriaHansaJunior',
-      delay: 210,
-    },
-    {
-      icon: <LinkedInIcon size={19} />,
-      label: 'LinkedIn',
-      display: 'aria-hansa-junior',
-      href: 'https://www.linkedin.com/in/aria-hansa-junior/',
-      delay: 260,
-    },
-    {
-      icon: <WhatsAppIcon size={19} />,
-      label: 'WhatsApp',
-      display: '0813-7005-3233',
-      href: 'https://wa.me/6281370053233',
-      delay: 310,
-      hoverClass: 'group-hover:text-[#25D366]',
-    },
-    {
-      icon: <MapPinIcon size={19} />,
-      label: 'Location',
-      display: 'Surabaya, Indonesia',
-      href: 'https://maps.app.goo.gl/qVMJBousZwG5PjQn9',
-      delay: 360,
-      hoverClass: 'group-hover:text-accent',
-    },
-  ]
-
   return (
-    <section id="contact" className="py-24 md:py-32 lg:py-36 border-t border-edge">
+    <section
+      id="contact"
+      className="relative py-24 sm:py-32 lg:py-40 border-t border-edge/60 overflow-hidden"
+      aria-label="Contact"
+    >
       <div className={CONTAINER}>
-        <FadeIn>
+        <Reveal direction="up" distance={20}>
           <SectionLabel>{c.contactLabel}</SectionLabel>
-        </FadeIn>
+        </Reveal>
 
-        <FadeIn delay={60}>
-          <h2 className="text-fg font-semibold tracking-tight leading-[1.04] mb-5 text-[clamp(3rem,8vw,6rem)]">
-            {c.contactHeading}
+        {/* Cinematic Climax Heading: LET'S CONNECT */}
+        <div className="mt-6 mb-12 sm:mb-16 select-none">
+          <h2 className="font-bold tracking-tighter leading-[0.9] text-fg">
+            <Reveal direction="up" distance={30} delay={200}>
+              <span className="block text-[clamp(2.5rem,6vw,5rem)] text-dim">
+                {c.contactHeadingTop}
+              </span>
+            </Reveal>
+            <Reveal direction="up" distance={30} delay={400}>
+              <span className="block text-[clamp(2.5rem,6vw,5rem)] text-fg">
+                {c.contactHeadingBottom}
+              </span>
+            </Reveal>
           </h2>
-        </FadeIn>
-
-        <FadeIn delay={110}>
-          <p className="text-dim text-[15px] md:text-base leading-[1.75] max-w-[480px] mb-12">
-            {c.contactSub}
-          </p>
-        </FadeIn>
-
-        {/* Contact cards */}
-        <div className="flex flex-col gap-4 mb-5">
-          {/* Top Row (3 items) */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {primary.slice(0, 3).map((item) => (
-              <FadeIn key={item.label} delay={item.delay}>
-                <a
-                  href={item.href}
-                  target={item.href.startsWith('mailto') || item.href === '#' ? undefined : '_blank'}
-                  rel={item.href.startsWith('mailto') || item.href === '#' ? undefined : 'noopener noreferrer'}
-                  className="group flex items-start gap-4 p-5 border border-edge rounded-lg hover:border-accent/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/5 cursor-pointer h-full"
-                  style={{ background: '#13151D' }}
-                >
-                  <span className={`text-dim transition-colors duration-300 mt-0.5 flex-shrink-0 ${item.hoverClass || 'group-hover:text-accent'}`}>
-                    {item.icon}
-                  </span>
-                  <div className="min-w-0">
-                    <div className="font-mono text-[10px] tracking-[0.12em] text-dim uppercase mb-1">
-                      {item.label}
-                    </div>
-                    <div className={`text-fg text-[13px] font-medium transition-colors duration-300 ${item.label === 'Location' ? 'leading-relaxed text-[12px]' : 'truncate'} ${item.hoverClass || 'group-hover:text-accent'}`}>
-                      {item.label === 'Location' ? c.address : item.display}
-                    </div>
-                  </div>
-                </a>
-              </FadeIn>
-            ))}
-          </div>
-
-          {/* Bottom Row (2 items, centered) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:px-[16.666%]">
-            {primary.slice(3).map((item) => (
-              <FadeIn key={item.label} delay={item.delay}>
-                <a
-                  href={item.href}
-                  target={item.href.startsWith('mailto') || item.href === '#' ? undefined : '_blank'}
-                  rel={item.href.startsWith('mailto') || item.href === '#' ? undefined : 'noopener noreferrer'}
-                  className="group flex items-start gap-4 p-5 border border-edge rounded-lg hover:border-accent/40 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/5 cursor-pointer h-full"
-                  style={{ background: '#13151D' }}
-                >
-                  <span className={`text-dim transition-colors duration-300 mt-0.5 flex-shrink-0 ${item.hoverClass || 'group-hover:text-accent'}`}>
-                    {item.icon}
-                  </span>
-                  <div className="min-w-0">
-                    <div className="font-mono text-[10px] tracking-[0.12em] text-dim uppercase mb-1">
-                      {item.label}
-                    </div>
-                    <div className={`text-fg text-[13px] font-medium transition-colors duration-300 ${item.label === 'Location' ? 'leading-relaxed text-[12px]' : 'truncate'} ${item.hoverClass || 'group-hover:text-accent'}`}>
-                      {item.label === 'Location' ? c.address : item.display}
-                    </div>
-                  </div>
-                </a>
-              </FadeIn>
-            ))}
-          </div>
         </div>
 
+        {/* Contact Grid with Staggered Entrance */}
+        <StaggerGroup interval={250} delay={600} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-5">
+          {/* Email */}
+          <StaggerItem index={0} direction="up" distance={40}>
+            <a
+              href={`mailto:${c.email}`}
+              className="group p-6 rounded-xl bg-surface/70 border border-edge hover:border-accent/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-accent/5 backdrop-blur-sm cursor-pointer flex flex-col justify-between min-h-[140px] h-full"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] tracking-widest text-dim uppercase">EMAIL</span>
+                <span className="text-dim group-hover:text-accent transition-colors duration-200">
+                  <EmailIcon size={18} />
+                </span>
+              </div>
+              <div className="text-fg font-medium text-sm sm:text-[15px] group-hover:text-accent transition-colors duration-200 truncate">
+                {c.email}
+              </div>
+            </a>
+          </StaggerItem>
+
+          {/* WhatsApp */}
+          <StaggerItem index={1} direction="up" distance={40}>
+            <a
+              href={c.whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group p-6 rounded-xl bg-surface/70 border border-edge hover:border-[#25D366]/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#25D366]/5 backdrop-blur-sm cursor-pointer flex flex-col justify-between min-h-[140px] h-full"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] tracking-widest text-dim uppercase">WHATSAPP</span>
+                <span className="text-dim group-hover:text-[#25D366] transition-colors duration-200">
+                  <WhatsAppIcon size={18} />
+                </span>
+              </div>
+              <div className="text-fg font-medium text-sm sm:text-[15px] group-hover:text-[#25D366] transition-colors duration-200">
+                {c.whatsappDisplay}
+              </div>
+            </a>
+          </StaggerItem>
+
+          {/* GitHub */}
+          <StaggerItem index={2} direction="up" distance={40}>
+            <a
+              href={c.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group p-6 rounded-xl bg-surface/70 border border-edge hover:border-fg/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-white/5 backdrop-blur-sm cursor-pointer flex flex-col justify-between min-h-[140px] h-full"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] tracking-widest text-dim uppercase">GITHUB</span>
+                <span className="text-dim group-hover:text-fg transition-colors duration-200">
+                  <GitHubIcon size={18} />
+                </span>
+              </div>
+              <div className="text-fg font-medium text-sm sm:text-[15px] group-hover:text-fg transition-colors duration-200">
+                AriaHansaJunior
+              </div>
+            </a>
+          </StaggerItem>
+
+          {/* LinkedIn */}
+          <StaggerItem index={3} direction="up" distance={40}>
+            <a
+              href={c.linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group p-6 rounded-xl bg-surface/70 border border-edge hover:border-[#0A66C2]/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#0A66C2]/5 backdrop-blur-sm cursor-pointer flex flex-col justify-between min-h-[140px] h-full"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] tracking-widest text-dim uppercase">LINKEDIN</span>
+                <span className="text-dim group-hover:text-[#0A66C2] transition-colors duration-200">
+                  <LinkedInIcon size={18} />
+                </span>
+              </div>
+              <div className="text-fg font-medium text-sm sm:text-[15px] group-hover:text-[#0A66C2] transition-colors duration-200">
+                aria-hansa-junior
+              </div>
+            </a>
+          </StaggerItem>
+
+          {/* Address */}
+          <StaggerItem index={4} direction="up" distance={40} className="sm:col-span-2 lg:col-span-2">
+            <a 
+              href="https://maps.app.goo.gl/R3i5BvKfuBrbN6WL8" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="group p-6 rounded-xl bg-surface/70 border border-edge hover:border-accent/60 backdrop-blur-sm flex flex-col justify-between min-h-[140px] h-full transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-accent/5 cursor-pointer"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] tracking-widest text-dim uppercase">LOCATION</span>
+                <span className="text-accent group-hover:text-accent-h transition-colors duration-200">
+                  <MapPinIcon size={18} />
+                </span>
+              </div>
+              <div className="text-dim group-hover:text-fg font-mono text-[12px] sm:text-[13px] leading-relaxed transition-colors duration-200">
+                {c.address}
+              </div>
+            </a>
+          </StaggerItem>
+        </StaggerGroup>
       </div>
     </section>
-  )
+  );
 }

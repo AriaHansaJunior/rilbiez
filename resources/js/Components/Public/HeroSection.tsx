@@ -1,104 +1,143 @@
+import { useState, useEffect, useContext } from 'react';
 import { ArrowUpRight, MapPinIcon } from './Icons';
-import { CONTAINER } from './Shared';
+import { CONTAINER, Reveal, ResetContext } from './Shared';
 import { copy } from './Copy';
-import { useState, useEffect } from 'react';
 
-function Typewriter({ texts }: { texts: string[] }) {
-  const [text, setText] = useState('');
-  const [index, setIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
+/**
+ * ProfilePhotoVisual:
+ * Brings back the user's photo with a cinematic glowing background.
+ */
+function ProfilePhotoVisual() {
+  return (
+    <div
+      className="relative w-[250px] h-[250px] min-[360px]:w-[280px] min-[360px]:h-[280px] sm:w-[340px] sm:h-[340px] lg:w-[400px] lg:h-[400px] flex items-center justify-center select-none hero-zoom-visual"
+    >
+      {/* Ambient core glow */}
+      <div className="absolute inset-4 rounded-full bg-gradient-to-tr from-accent/30 to-transparent blur-[60px] opacity-80" />
+
+      {/* Outer subtle orbital ring */}
+      <div className="absolute inset-0 rounded-full border border-edge/60" />
+
+      {/* Photo Container */}
+      <div className="relative w-48 h-48 min-[360px]:w-56 min-[360px]:h-56 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full border border-edge shadow-2xl overflow-hidden bg-surface/40 backdrop-blur-sm">
+        <img
+          src="/images/pas foto_transparan bg.png"
+          alt="Aria Hansa Junior"
+          className="w-full h-full object-cover object-top scale-[1.05]"
+        />
+        {/* Subtle inner shadow overlay */}
+        <div className="absolute inset-0 rounded-full shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] pointer-events-none" />
+      </div>
+    </div>
+  );
+}
+
+function TypewriterText({ text, delay = 0 }: { text: string, delay?: number }) {
+  const [displayText, setDisplayText] = useState('');
+  const resetSignal = useContext(ResetContext);
 
   useEffect(() => {
-    const currentText = texts[index % texts.length];
-    const delay = isDeleting ? 30 : 100;
-    
-    const timeout = setTimeout(() => {
-      if (!isDeleting && text === currentText) {
-        setTimeout(() => setIsDeleting(true), 2500);
-      } else if (isDeleting && text === '') {
-        setIsDeleting(false);
-        setIndex(i => i + 1);
-      } else {
-        setText(currentText.substring(0, text.length + (isDeleting ? -1 : 1)));
-      }
+    setDisplayText(''); // Reset text when signal changes
+    let i = 0;
+    const timer = setTimeout(() => {
+      const interval = setInterval(() => {
+        setDisplayText(text.substring(0, i + 1));
+        i++;
+        if (i === text.length) clearInterval(interval);
+      }, 50); // typing speed
+      return () => clearInterval(interval);
     }, delay);
+    return () => clearTimeout(timer);
+  }, [text, delay, resetSignal]);
 
-    return () => clearTimeout(timeout);
-  }, [text, isDeleting, index, texts]);
-
-  return <span className="border-r-2 border-accent pr-1.5">{text}</span>;
+  return (
+    <span>
+      {displayText}
+      <span className="animate-pulse border-r-2 border-accent ml-0.5 inline-block h-[0.8em] align-middle" />
+    </span>
+  );
 }
 
 export function HeroSection({ c }: { c: (typeof copy)['en'] }) {
   const scrollToContact = () => {
-    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
-  }
+    document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToProjects = () => {
+    document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
-    <section className="relative min-h-screen flex items-center pt-20 pb-16" aria-label="Hero">
+    <div
+      id="hero"
+      className="relative min-h-[90vh] sm:min-h-screen w-full flex items-center pt-24 pb-16 overflow-hidden hero-parallax-bg"
+      aria-label="Hero"
+    >
       <div className={`${CONTAINER} w-full`}>
-        <div className="flex flex-col md:flex-row md:items-center gap-14 md:gap-14 lg:gap-20 xl:gap-28">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 sm:gap-14 lg:gap-16 xl:gap-24">
 
-          {/* Text */}
-          <div className="flex-1 min-w-0">
-            <div
-              className="flex items-center gap-3 mb-9"
-              style={{ animation: 'fadeUp 0.6s ease 0.05s both' }}
-            >
-              <span className="block w-5 h-px bg-accent flex-shrink-0" />
-              <span className="font-mono text-[11px] tracking-[0.16em] text-accent uppercase">
-                {c.heroLabel}
-              </span>
-            </div>
+          {/* Left Content Column */}
+          <div className="flex-1 min-w-0 z-10 hero-text-shift w-full">
+            <Reveal delay={300} direction="up" distance={40}>
+              {/* Section Tag */}
+              <div className="flex items-center gap-3 mb-6 sm:mb-8">
+                <span className="block w-6 h-px bg-accent flex-shrink-0" />
+                <span className="font-mono text-[11px] sm:text-[12px] tracking-[0.16em] text-accent uppercase font-medium">
+                  {c.heroLabel}
+                </span>
+              </div>
 
-            <h1
-              className="text-fg font-semibold leading-[1.08] tracking-tight mb-5"
-              style={{ animation: 'fadeUp 0.65s ease 0.12s both' }}
-            >
-              <span className="block text-2xl sm:text-3xl md:text-[28px] lg:text-[34px] font-normal text-dim mb-1.5">
-                {c.heroGreeting}
-              </span>
-              <span className="block text-[clamp(2rem,4vw,3.75rem)] leading-[1.06]">
-                <Typewriter texts={[c.heroRole, ...c.heroTypewriter]} />
-              </span>
-            </h1>
+              {/* Main Greeting & Role */}
+              <div className="mb-6 sm:mb-8">
+                <h1 className="text-fg font-semibold tracking-tight leading-[1.08]">
+                  <span className="block text-2xl sm:text-3xl md:text-4xl text-dim font-normal mb-2 min-h-[1.5em]">
+                    <TypewriterText text={c.heroGreeting} delay={800} />
+                  </span>
+                  <span className="block text-[clamp(2.2rem,5vw,4.2rem)] font-bold tracking-tight text-fg">
+                    {c.heroRole}
+                  </span>
+                </h1>
+              </div>
 
-            <div
-              className="flex items-center gap-2 text-dim mb-8"
-              style={{ animation: 'fadeUp 0.6s ease 0.2s both' }}
-            >
-              <span className="text-dim/70"><MapPinIcon size={13} /></span>
-              <span className="font-mono text-[12px] tracking-wide">{c.heroLocation}</span>
-            </div>
+              {/* Location Badge */}
+              <div className="flex items-center gap-2 text-dim mb-8 sm:mb-10">
+                <span className="text-accent flex-shrink-0">
+                  <MapPinIcon size={14} />
+                </span>
+                <span className="font-mono text-[12px] sm:text-[13px] tracking-wide">
+                  {c.heroLocation}
+                </span>
+              </div>
 
-            <p
-              className="text-dim text-[15px] md:text-base leading-[1.75] max-w-[500px] mb-10"
-              style={{ animation: 'fadeUp 0.6s ease 0.27s both' }}
-            >
-              {c.heroCopy}
-            </p>
+              {/* CTAs */}
+              <div className="flex flex-wrap items-center gap-4">
+                <button
+                  onClick={scrollToContact}
+                  className="inline-flex items-center gap-2 bg-accent hover:bg-accent-h text-white font-medium text-[13.5px] px-6 py-3.5 rounded-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-lg shadow-accent/20"
+                >
+                  {c.heroCTA}
+                  <ArrowUpRight size={15} />
+                </button>
 
-            <div style={{ animation: 'fadeUp 0.6s ease 0.34s both' }}>
-              <button
-                onClick={scrollToContact}
-                className="inline-flex items-center gap-2.5 bg-accent hover:bg-accent-h text-white font-medium text-sm px-6 py-3 rounded-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
-              >
-                {c.heroCTA}
-                <ArrowUpRight size={15} />
-              </button>
-            </div>
+                <button
+                  onClick={scrollToProjects}
+                  className="inline-flex items-center gap-2 text-dim hover:text-fg border border-edge hover:border-accent/60 font-medium text-[13.5px] px-5 py-3.5 rounded-md transition-all duration-200 cursor-pointer"
+                >
+                  {c.heroSecondaryCTA}
+                </button>
+              </div>
+            </Reveal>
           </div>
 
-          {/* Photo */}
-          <div
-            className="w-full sm:max-w-sm sm:mx-auto md:mx-0 md:w-[340px] lg:w-[390px] xl:w-[430px] flex-shrink-0 relative"
-            style={{ animation: 'fadeIn 0.8s ease 0.18s both' }}
-          >
-             <div className="absolute inset-0 bg-accent/20 blur-[60px] rounded-full scale-90" />
-             <img src="/images/pas foto_transparan bg.png" alt="Aria Hansa Junior" className="w-full h-auto object-cover relative z-10 drop-shadow-2xl" />
+          {/* Right Abstract Profile Visual Column */}
+          <div className="w-full sm:w-auto flex justify-center lg:justify-end flex-shrink-0 z-10">
+            <Reveal delay={600} direction="none" distance={0}>
+              <ProfilePhotoVisual />
+            </Reveal>
           </div>
+
         </div>
       </div>
-    </section>
-  )
+    </div>
+  );
 }
