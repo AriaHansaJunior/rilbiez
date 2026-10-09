@@ -16,4 +16,11 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_brain_challenge_returns_a_successful_response(): void
+    {
+        $response = $this->get('/brain-challenge');
+
+        $response->assertStatus(200);
+    }
 }
