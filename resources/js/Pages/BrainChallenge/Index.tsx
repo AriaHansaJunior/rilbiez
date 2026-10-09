@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from '@inertiajs/react';
 import { BackgroundMotion } from '../../Components/Motion/BackgroundMotion';
 import {
   TARGET_TOTAL,
@@ -282,13 +283,13 @@ export default function BrainChallenge() {
       <header className="relative z-20 w-full flex-shrink-0 border-b border-edge/80 bg-[#090A0F]/85 backdrop-blur-md">
         <div className="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-8 h-14 flex items-center justify-between">
           {/* Back to RILBIEZ Link */}
-          <a
+          <Link
             href="/"
             className="group inline-flex items-center gap-2 text-dim hover:text-fg font-mono text-[12px] sm:text-[13px] tracking-wide border border-edge/80 hover:border-accent/60 bg-surface/70 px-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer shadow-sm"
           >
             <span className="transform group-hover:-translate-x-1 transition-transform duration-200">←</span>
             <span>Back to RILBIEZ</span>
-          </a>
+          </Link>
 
           {/* Module Identifier & Target Indicator */}
           <div className="flex items-center gap-3">

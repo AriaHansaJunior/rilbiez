@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from '@inertiajs/react';
 import { Lang, copy } from './Copy';
 import { CloseIcon, MenuIcon } from './Icons';
 import { CONTAINER } from './Shared';
@@ -87,15 +88,25 @@ export function Navbar({
 
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-8" aria-label="Main navigation">
-            {c.navLinks.map((link) => (
-              <button
-                key={link.href}
-                onClick={() => handleNav(link.href)}
-                className="text-dim hover:text-fg text-[13px] font-mono tracking-wide transition-colors duration-200 cursor-pointer"
-              >
-                {link.label}
-              </button>
-            ))}
+            {c.navLinks.map((link) =>
+              link.href.startsWith('#') ? (
+                <button
+                  key={link.href}
+                  onClick={() => handleNav(link.href)}
+                  className="text-dim hover:text-fg text-[13px] font-mono tracking-wide transition-colors duration-200 cursor-pointer"
+                >
+                  {link.label}
+                </button>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-dim hover:text-fg text-[13px] font-mono tracking-wide transition-colors duration-200 cursor-pointer"
+                >
+                  {link.label}
+                </Link>
+              )
+            )}
           </nav>
 
           {/* Language Switcher & Mobile Menu Button */}
@@ -122,15 +133,26 @@ export function Navbar({
         ].join(' ')}
       >
         <nav className={`${CONTAINER} py-4 flex flex-col gap-1`} aria-label="Mobile navigation">
-          {c.navLinks.map((link) => (
-            <button
-              key={link.href}
-              onClick={() => handleNav(link.href)}
-              className="flex w-full text-left text-dim hover:text-fg text-sm font-mono tracking-wide py-3 border-b border-edge/30 last:border-0 transition-colors duration-200 cursor-pointer"
-            >
-              {link.label}
-            </button>
-          ))}
+          {c.navLinks.map((link) =>
+            link.href.startsWith('#') ? (
+              <button
+                key={link.href}
+                onClick={() => handleNav(link.href)}
+                className="flex w-full text-left text-dim hover:text-fg text-sm font-mono tracking-wide py-3 border-b border-edge/30 last:border-0 transition-colors duration-200 cursor-pointer"
+              >
+                {link.label}
+              </button>
+            ) : (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                className="flex w-full text-left text-dim hover:text-fg text-sm font-mono tracking-wide py-3 border-b border-edge/30 last:border-0 transition-colors duration-200 cursor-pointer"
+              >
+                {link.label}
+              </Link>
+            )
+          )}
         </nav>
       </div>
     </header>
