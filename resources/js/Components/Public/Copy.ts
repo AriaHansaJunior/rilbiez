@@ -36,7 +36,7 @@ export const copy = {
     projectBadge: 'Featured Project',
     projectTitle: 'IndoLens',
     projectDesc: 'IndoLens is an AI-powered Indonesian actor face-recognition system using Computer Vision. It combines YOLOv8 face detection with FaceNet 128-dimensional facial feature embedding and recognition in a modern Laravel 11 web interface.',
-    projectCTA: 'View Project →',
+    projectCTA: 'View Project',
     projectUrl: 'https://indolens.webprojek.site/',
     projectTags: [
       'PHP 8.2+',
@@ -102,7 +102,7 @@ export const copy = {
     projectBadge: 'Proyek Unggulan',
     projectTitle: 'IndoLens',
     projectDesc: 'IndoLens adalah sistem pengenalan wajah aktor Indonesia berbasis kecerdasan buatan dan Computer Vision. Sistem ini menggabungkan YOLOv8 untuk deteksi wajah dengan FaceNet untuk embedding serta pengenalan fitur wajah 128 dimensi dalam antarmuka web Laravel 11 modern.',
-    projectCTA: 'Lihat Proyek →',
+    projectCTA: 'Lihat Proyek',
     projectUrl: 'https://indolens.webprojek.site/',
     projectTags: [
       'PHP 8.2+',

@@ -1,4 +1,3 @@
-import { ArrowUpRight } from './Icons';
 import { CONTAINER, SectionLabel, Reveal, StaggerGroup, StaggerItem } from './Shared';
 import { copy } from './Copy';
 
@@ -104,10 +103,9 @@ export function ProjectsSection({ c }: { c: (typeof copy)['en'] }) {
                     href={c.projectUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2.5 bg-accent hover:bg-accent-h text-white font-medium text-[13.5px] px-6 py-3.5 rounded-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-lg shadow-accent/20 w-fit"
+                    className="inline-flex items-center justify-center bg-accent hover:bg-accent-h text-white font-medium text-[13.5px] px-6 py-3.5 rounded-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-lg shadow-accent/20 w-fit"
                   >
                     <span>{c.projectCTA}</span>
-                    <ArrowUpRight size={15} />
                   </a>
                 </div>
               </div>

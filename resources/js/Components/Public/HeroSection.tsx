@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { ArrowUpRight, MapPinIcon } from './Icons';
+import { MapPinIcon } from './Icons';
 import { CONTAINER, Reveal, ResetContext } from './Shared';
 import { copy } from './Copy';
 
@@ -113,10 +113,9 @@ export function HeroSection({ c }: { c: (typeof copy)['en'] }) {
               <div className="flex flex-wrap items-center gap-4">
                 <button
                   onClick={scrollToContact}
-                  className="inline-flex items-center gap-2 bg-accent hover:bg-accent-h text-white font-medium text-[13.5px] px-6 py-3.5 rounded-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-lg shadow-accent/20"
+                  className="inline-flex items-center justify-center bg-accent hover:bg-accent-h text-white font-medium text-[13.5px] px-6 py-3.5 rounded-md transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-lg shadow-accent/20"
                 >
                   {c.heroCTA}
-                  <ArrowUpRight size={15} />
                 </button>
 
                 <button
