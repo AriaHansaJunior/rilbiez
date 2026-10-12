@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, Head } from '@inertiajs/react';
 import { BackgroundMotion } from '../../Components/Motion/BackgroundMotion';
 import {
   TARGET_TOTAL,
@@ -27,6 +27,7 @@ interface RecordedMove {
 }
 
 export default function BrainChallenge() {
+  const [mounted, setMounted] = useState(false);
   const [gameState, setGameState] = useState<GameState>('intro');
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [currentNumber, setCurrentNumber] = useState<number>(0);
@@ -48,8 +49,9 @@ export default function BrainChallenge() {
   const movesHistoryRef = useRef<RecordedMove[]>([]);
   const hasPersistedRef = useRef<boolean>(false);
 
-  // Load local browser statistics on mount
+  // Trigger smooth entrance animation on mount and load stats
   useEffect(() => {
+    setMounted(true);
     setBrowserStats(loadBrowserStats());
   }, []);
 
@@ -94,7 +96,6 @@ export default function BrainChallenge() {
       },
       body: JSON.stringify(payload),
     }).catch((err) => {
-      // Non-blocking error handling: ensure gameplay remains smooth even if network fails
       console.warn('Brain Challenge match persistence warning:', err);
     });
   };
@@ -173,7 +174,6 @@ export default function BrainChallenge() {
     const thinkingDelay = getBotThinkingDelay();
 
     const botTimeout = setTimeout(() => {
-      // Invalidation check: Ensure this timeout belongs to the current active game
       if (activeGeneration !== generationRef.current) {
         return;
       }
@@ -183,7 +183,6 @@ export default function BrainChallenge() {
         return;
       }
 
-      // Compute bot move from deterministic/probabilistic strategies
       const botMove = getBotMove(
         difficultyRef.current,
         totalAtTurn,
@@ -195,7 +194,6 @@ export default function BrainChallenge() {
       currentNumberRef.current = nextTotal;
       setIsBotThinking(false);
 
-      // Record sequential bot move
       const newMove: RecordedMove = {
         move_number: movesHistoryRef.current.length + 1,
         actor: 'computer',
@@ -231,7 +229,6 @@ export default function BrainChallenge() {
     const firstTurn = getRandomStartingTurn();
     setCurrentTurn(firstTurn);
 
-    // Initialize fresh persistence session metadata
     gameIdRef.current = 'bc_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
     startedAtRef.current = new Date().toISOString();
     firstPlayerRef.current = firstTurn;
@@ -253,115 +250,129 @@ export default function BrainChallenge() {
     setGameState('intro');
   };
 
-  const difficultyMeta: Record<Difficulty, { label: string; badge: string; desc: string; color: string }> = {
+  const difficultyDetails: Record<Difficulty, { label: string; desc: string }> = {
     easy: {
       label: 'Easy',
-      badge: 'EXPLORATORY',
-      desc: 'Relaxed cognitive sparring with opportunistic moves.',
-      color: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10',
+      desc: 'Casual & relaxed. Great for warming up.',
     },
     medium: {
       label: 'Medium',
-      badge: 'STRATEGIC',
-      desc: 'Tactical arithmetic foresight targeting key milestone multiples.',
-      color: 'border-cyan-500/40 text-cyan-400 bg-cyan-500/10',
+      desc: 'Balanced. The computer plays smart moves.',
     },
     hard: {
       label: 'Hard',
-      badge: 'MINIMAX OPTIMAL',
-      desc: 'Rigorous mathematical precision that punishes sub-optimal intervals.',
-      color: 'border-accent/60 text-accent bg-accent/10',
+      desc: 'Flawless strategy. Punishes any misstep.',
     },
   };
 
+  const lastMove = movesHistoryRef.current[movesHistoryRef.current.length - 1];
+
   return (
-    <div className="relative h-screen max-h-screen bg-bg text-fg selection:bg-accent/30 selection:text-white flex flex-col font-sans overflow-hidden">
+    <div className="relative min-h-screen bg-bg text-fg selection:bg-accent/30 selection:text-white flex flex-col font-sans">
+      <Head title="Brain Challenge" />
+
       {/* Background Motion Layer */}
       <BackgroundMotion />
 
-      {/* Top Bar Navigation */}
-      <header className="relative z-20 w-full flex-shrink-0 border-b border-edge/80 bg-[#090A0F]/85 backdrop-blur-md">
-        <div className="max-w-[1100px] mx-auto px-4 sm:px-6 md:px-8 h-14 flex items-center justify-between">
-          {/* Back to RILBIEZ Link */}
+      {/* Top Header - Matching Homepage Navbar with Logo + Brand */}
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-edge/80 bg-[#090A0F]/85 backdrop-blur-md">
+        <div className="max-w-[1200px] mx-auto px-6 sm:px-8 md:px-12 h-16 md:h-[70px] flex items-center justify-between">
+          {/* Logo + RILBIEZ - clicking returns to homepage */}
           <Link
             href="/"
-            className="group inline-flex items-center gap-2 text-dim hover:text-fg font-mono text-[12px] sm:text-[13px] tracking-wide border border-edge/80 hover:border-accent/60 bg-surface/70 px-3 py-1.5 rounded-md transition-all duration-200 cursor-pointer shadow-sm"
+            className="flex items-center gap-2.5 text-fg hover:text-accent transition-colors duration-200 group cursor-pointer"
+            aria-label="RILBIEZ"
           >
-            <span className="transform group-hover:-translate-x-1 transition-transform duration-200">←</span>
-            <span>Back to RILBIEZ</span>
+            <img
+              src="/images/Rilbiez_logo_transparan.png"
+              alt="Rilbiez"
+              className="w-7 h-7 object-contain drop-shadow-[0_0_10px_rgba(200,77,22,0.4)] group-hover:scale-105 transition-transform duration-200"
+            />
+            <span className="font-semibold tracking-[0.2em] text-[13.5px]">RILBIEZ</span>
           </Link>
 
-          {/* Module Identifier & Target Indicator */}
+          {/* Right Header: Clean subtle indicator & stats */}
           <div className="flex items-center gap-3">
-            <span className="hidden sm:inline-block font-mono text-[11px] text-accent tracking-[0.18em] uppercase font-medium">
-              NEURAL WARM-UP
-            </span>
-            <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-edge" />
-            <div className="inline-flex items-center gap-1.5 font-mono text-[11px] sm:text-[12px] text-fg bg-surface/90 border border-edge px-2.5 py-1 rounded">
-              <span className="text-dim">TARGET:</span>
-              <span className="text-accent font-bold">100</span>
-            </div>
+            
+            {(browserStats.wins > 0 || browserStats.losses > 0) && (
+              <div className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[11px] text-dim border border-edge/60 px-2.5 py-1 rounded-md">
+                <span className="text-emerald-400 font-medium">{browserStats.wins} Win</span>
+                <span>/</span>
+                <span className="text-red-600" >{browserStats.losses} Loss</span>
+              </div>
+            )}
           </div>
         </div>
       </header>
 
-      {/* Main Content Area - Centered and compact */}
-      <main className="relative z-10 flex-1 flex items-center justify-center p-3 sm:p-5 overflow-hidden">
-        <div className="w-full max-w-[760px] mx-auto">
+      {/* Main Content Area - Native body layout without heavy card boxing */}
+      <main className="relative z-10 flex-1 flex flex-col pt-24 pb-16 sm:pt-28 sm:pb-20">
+        <div
+          className={[
+            'max-w-[1000px] w-full mx-auto px-6 sm:px-8 md:px-10 flex-1 flex flex-col justify-center transition-all duration-700 ease-out',
+            mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
+          ].join(' ')}
+        >
           {/* =========================================================================
               VIEW 1: INTRODUCTION & SETUP (gameState === 'intro')
              ========================================================================= */}
           {gameState === 'intro' && (
-            <div className="rounded-2xl border border-edge bg-surface/90 backdrop-blur-md p-5 sm:p-7 shadow-2xl transition-all">
-              {/* Introduction Header */}
-              <div className="mb-4 sm:mb-5">
-                <div className="inline-flex items-center gap-2 mb-2">
-                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                  <span className="font-mono text-[10.5px] sm:text-[11px] tracking-[0.2em] text-accent uppercase font-medium">
-                    COGNITIVE EXERCISE // 01
-                  </span>
-                </div>
-                <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-bold tracking-tight text-fg mb-2">
-                  Target 100 Warm-Up
-                </h1>
-                <p className="text-dim text-xs sm:text-[13.5px] leading-relaxed max-w-2xl">
-                  A focused mental arithmetic sparring challenge to awaken strategic foresight. You and the computer
-                  take turns adding any integer from <strong className="text-fg font-mono">+1 to +10</strong> to a
-                  shared running count. The mind that secures exactly <strong className="text-accent font-mono">100</strong> claims victory.
-                </p>
+            <div className="py-2 sm:py-6">
+              {/* Section Tag */}
+              <div className="flex items-center gap-3 mb-4 sm:mb-6 select-none">
+                <span className="block w-6 h-px bg-accent flex-shrink-0" />
+                <span className="font-mono text-[11px] sm:text-[12px] tracking-[0.16em] text-accent uppercase font-medium">
+                  Brain Challenge
+                </span>
               </div>
 
-              {/* Rules of Engagement */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mb-4 sm:mb-5">
-                <div className="p-3 rounded-xl border border-edge/70 bg-bg/60">
-                  <span className="font-mono text-[9.5px] text-accent tracking-widest block mb-0.5">01 / MECHANIC</span>
-                  <p className="text-[11.5px] text-dim leading-snug">
-                    Choose an addition step between <span className="text-fg font-mono">+1</span> and{' '}
-                    <span className="text-fg font-mono">+10</span> on each turn.
+              {/* Title & Description */}
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-fg mb-4">
+                Target 100
+              </h1>
+              <p className="text-dim text-sm sm:text-base md:text-[17px] leading-relaxed max-w-2xl mb-8 sm:mb-10">
+                A simple turn-based numbers duel. Take turns adding any integer from{' '}
+                <span className="text-fg font-mono font-medium">+1</span> to{' '}
+                <span className="text-fg font-mono font-medium">+10</span> to a shared running count.
+                The first to reach exactly <span className="text-accent font-mono font-bold">100</span> wins.
+              </p>
+
+              {/* How it works: 3 Clean Steps */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 mb-8 sm:mb-10">
+                <div className="border border-edge/70 bg-surface/30 rounded-xl p-4 sm:p-5 backdrop-blur-xs">
+                  <span className="font-mono text-[11px] text-accent font-semibold tracking-wider uppercase block mb-1.5">
+                    01. Pick a number
+                  </span>
+                  <p className="text-xs sm:text-[13px] text-dim leading-relaxed">
+                    Choose any number from +1 to +10 on your turn to increase the count.
                   </p>
                 </div>
-                <div className="p-3 rounded-xl border border-edge/70 bg-bg/60">
-                  <span className="font-mono text-[9.5px] text-accent tracking-widest block mb-0.5">02 / SEQUENCE</span>
-                  <p className="text-[11.5px] text-dim leading-snug">
-                    Alternate turns seamlessly with the system. Count increments in real time.
+                <div className="border border-edge/70 bg-surface/30 rounded-xl p-4 sm:p-5 backdrop-blur-xs">
+                  <span className="font-mono text-[11px] text-accent font-semibold tracking-wider uppercase block mb-1.5">
+                    02. Take turns
+                  </span>
+                  <p className="text-xs sm:text-[13px] text-dim leading-relaxed">
+                    The computer answers with its move. Think ahead to control the pace.
                   </p>
                 </div>
-                <div className="p-3 rounded-xl border border-edge/70 bg-bg/60">
-                  <span className="font-mono text-[9.5px] text-accent tracking-widest block mb-0.5">03 / OBJECTIVE</span>
-                  <p className="text-[11.5px] text-dim leading-snug">
-                    Anticipate milestone multiples to force your opponent and land on <span className="text-accent font-mono font-semibold">100</span>.
+                <div className="border border-edge/70 bg-surface/30 rounded-xl p-4 sm:p-5 backdrop-blur-xs">
+                  <span className="font-mono text-[11px] text-accent font-semibold tracking-wider uppercase block mb-1.5">
+                    03. Reach 100
+                  </span>
+                  <p className="text-xs sm:text-[13px] text-dim leading-relaxed">
+                    The player who lands on exactly 100 claims victory.
                   </p>
                 </div>
               </div>
 
               {/* Difficulty Selection */}
-              <div className="mb-5 sm:mb-6">
-                <label className="block font-mono text-[10px] sm:text-[10.5px] tracking-widest text-dim uppercase mb-2.5">
-                  SELECT DIFFICULTY
-                </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+              <div className="mb-8 sm:mb-10">
+                <span className="block font-mono text-[10.5px] sm:text-[11px] tracking-widest text-dim uppercase mb-3">
+                  Select Difficulty
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => {
-                    const meta = difficultyMeta[d];
+                    const meta = difficultyDetails[d];
                     const isSelected = difficulty === d;
                     return (
                       <button
@@ -369,39 +380,33 @@ export default function BrainChallenge() {
                         type="button"
                         onClick={() => setDifficulty(d)}
                         className={[
-                          'relative text-left p-3 rounded-xl border transition-all duration-200 cursor-pointer flex flex-col justify-between min-h-[82px] sm:min-h-[88px]',
+                          'text-left p-4 rounded-xl border transition-all duration-200 cursor-pointer flex flex-col justify-between min-h-[92px]',
                           isSelected
-                            ? 'border-accent bg-accent/10 shadow-md shadow-accent/5 ring-1 ring-accent'
-                            : 'border-edge bg-bg/40 hover:border-edge/90 hover:bg-bg/70',
+                            ? 'border-accent bg-accent/10 shadow-lg shadow-accent/10 ring-1 ring-accent'
+                            : 'border-edge/70 bg-surface/30 hover:border-edge hover:bg-surface/60',
                         ].join(' ')}
                       >
                         <div className="flex items-center justify-between mb-1.5">
-                          <span className="font-bold text-fg text-xs sm:text-[13px] tracking-wide">{meta.label}</span>
-                          <span
-                            className={[
-                              'font-mono text-[8.5px] tracking-wider px-1.5 py-0.5 rounded border uppercase',
-                              meta.color,
-                            ].join(' ')}
-                          >
-                            {meta.badge}
-                          </span>
+                          <span className="font-semibold text-fg text-sm tracking-wide">{meta.label}</span>
+                          {isSelected && (
+                            <span className="w-2 h-2 rounded-full bg-accent" />
+                          )}
                         </div>
-                        <p className="text-[11px] text-dim leading-snug">{meta.desc}</p>
+                        <p className="text-xs text-dim leading-relaxed">{meta.desc}</p>
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* Start Challenge Button - Centered */}
-              <div className="pt-1 flex items-center justify-center">
+              {/* Start Challenge Button */}
+              <div>
                 <button
                   type="button"
                   onClick={handleStart}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-accent hover:bg-accent-h text-white font-medium text-[13.5px] px-8 py-3 rounded-lg transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-lg shadow-accent/25"
+                  className="inline-flex items-center gap-2.5 bg-accent hover:bg-accent-h text-white font-medium text-sm sm:text-[15px] px-8 py-3.5 rounded-lg transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-lg shadow-accent/25"
                 >
-                  <span>Start Challenge</span>
-                  <span className="font-mono text-base">→</span>
+                  <span>Start Game</span>
                 </button>
               </div>
             </div>
@@ -411,84 +416,91 @@ export default function BrainChallenge() {
               VIEW 2: ACTIVE GAME ARENA (gameState === 'playing')
              ========================================================================= */}
           {gameState === 'playing' && (
-            <div className="rounded-2xl border border-edge bg-surface/90 backdrop-blur-md p-5 sm:p-7 shadow-2xl transition-all">
-              {/* Arena Header Bar: Difficulty & Turn Indicator */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-edge/80">
-                {/* Visual Indication of Selected Difficulty */}
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-[9.5px] tracking-widest text-dim uppercase">DIFFICULTY:</span>
-                  <span
-                    className={[
-                      'font-mono text-[9.5px] tracking-widest px-2 py-0.5 rounded border uppercase font-medium',
-                      difficultyMeta[difficulty].color,
-                    ].join(' ')}
-                  >
-                    {difficultyMeta[difficulty].label} ({difficultyMeta[difficulty].badge})
+            <div className="py-2 sm:py-6">
+              {/* Arena Status Bar: Difficulty & Turn Indicator */}
+              <div className="flex items-center justify-between gap-3 pb-5 border-b border-edge/70">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs text-dim uppercase tracking-wider">Difficulty:</span>
+                  <span className="font-mono text-xs text-fg font-semibold uppercase px-2.5 py-0.5 rounded border border-edge bg-surface/50">
+                    {difficulty}
                   </span>
+                  <button
+                    type="button"
+                    onClick={handleChangeDifficulty}
+                    className="text-xs font-mono text-dim hover:text-accent transition-colors ml-1 cursor-pointer"
+                  >
+                    Change
+                  </button>
                 </div>
 
-                {/* Turn Indicator: You vs Computer */}
+                {/* Turn Indicator */}
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[9.5px] tracking-widest text-dim uppercase">CURRENT TURN:</span>
                   {currentTurn === 'you' ? (
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-mono text-[10.5px] font-semibold tracking-wide animate-pulse">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                      YOU
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-mono text-xs font-semibold">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      Your Turn
                     </div>
                   ) : (
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/40 text-purple-400 font-mono text-[10.5px] font-semibold tracking-wide animate-pulse">
-                      <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-                      {isBotThinking ? 'COMPUTER (THINKING...)' : 'COMPUTER'}
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/40 text-indigo-300 font-mono text-xs font-semibold">
+                      <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+                      {isBotThinking ? 'Computer is thinking...' : "Computer's turn"}
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Prominent Current-Number Display & Target Progress */}
-              <div className="py-6 sm:py-8 flex flex-col items-center justify-center text-center">
-                <span className="font-mono text-[10.5px] tracking-[0.2em] text-dim uppercase mb-1">
-                  CURRENT RUNNING TOTAL
+              {/* Running Total Display */}
+              <div className="py-8 sm:py-12 flex flex-col items-center justify-center text-center">
+                <span className="font-mono text-xs tracking-widest text-dim uppercase mb-2">
+                  Current Total
                 </span>
 
-                {/* Big Number */}
-                <div className="relative my-1">
-                  <span className="font-mono text-6xl sm:text-7xl md:text-8xl font-extrabold tracking-tighter text-fg drop-shadow-[0_0_20px_rgba(200,77,22,0.15)]">
+                <div className="relative flex items-baseline justify-center my-1">
+                  <span className="font-mono text-7xl sm:text-8xl md:text-9xl font-bold tracking-tight text-fg drop-shadow-[0_0_30px_rgba(200,77,22,0.15)]">
                     {currentNumber}
                   </span>
-                  <span className="text-dim/40 font-mono text-xl sm:text-2xl ml-2">/ 100</span>
+                  <span className="font-mono text-2xl sm:text-3xl text-dim/40 ml-2">/ 100</span>
                 </div>
 
-                {/* Progress Bar towards 100 */}
-                <div className="w-full max-w-sm mt-3">
-                  <div className="w-full h-1.5 bg-edge/70 rounded-full overflow-hidden p-0.5 border border-edge/40">
+                {/* Last move feedback */}
+                {lastMove && (
+                  <p className="text-xs sm:text-sm font-mono text-dim mt-3">
+                    {lastMove.actor === 'you' ? (
+                      <span>You added <strong className="text-emerald-400 font-semibold">+{lastMove.added_number}</strong></span>
+                    ) : (
+                      <span>Computer added <strong className="text-indigo-400 font-semibold">+{lastMove.added_number}</strong></span>
+                    )}
+                  </p>
+                )}
+
+                {/* Smooth Progress Bar */}
+                <div className="w-full max-w-md mt-6">
+                  <div className="w-full h-2 bg-edge/60 rounded-full overflow-hidden p-0.5 border border-edge/40">
                     <div
                       className="h-full bg-gradient-to-r from-accent to-accent-h rounded-full transition-all duration-300"
                       style={{ width: `${Math.min(100, currentNumber)}%` }}
                     />
                   </div>
-                  <div className="flex justify-between text-[9px] font-mono text-dim mt-1">
-                    <span>0 START</span>
-                    <span>50 MID</span>
-                    <span className="text-accent font-semibold">100 GOAL</span>
+                  <div className="flex justify-between text-[11px] font-mono text-dim mt-2">
+                    <span>0</span>
+                    <span>{100 - currentNumber > 0 ? `${100 - currentNumber} to reach 100` : 'Goal achieved'}</span>
+                    <span>100</span>
                   </div>
                 </div>
               </div>
 
-              {/* Number Addition Controls (+1 to +10) */}
-              <div className="pt-3.5 border-t border-edge/80">
-                <div className="flex items-center justify-between mb-2.5">
-                  <span className="font-mono text-[10px] sm:text-[10.5px] tracking-widest text-dim uppercase">
-                    CHOOSE YOUR ADDITION (+1 TO +10)
+              {/* Number Addition Keypad */}
+              <div className="pt-6 border-t border-edge/70">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-mono text-xs text-dim uppercase tracking-wider">
+                    Select your addition (+1 to +10)
                   </span>
-                  <span className="font-mono text-[9.5px] text-accent">
-                    {TARGET_TOTAL - currentNumber > 0
-                      ? `${TARGET_TOTAL - currentNumber} to target`
-                      : 'Goal achieved'}
+                  <span className="font-mono text-xs text-dim">
+                    {currentTurn === 'you' && !isBotThinking ? 'Your move' : 'Waiting for computer'}
                   </span>
                 </div>
 
-                {/* Keypad Grid for +1 .. +10 */}
-                <div className="grid grid-cols-5 sm:grid-cols-10 gap-1.5 sm:gap-2">
+                <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 sm:gap-2.5">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
                     const isExceeding = !isValidMove(currentNumber, num);
                     const isDisabled = isBotThinking || currentTurn !== 'you' || isExceeding;
@@ -499,10 +511,10 @@ export default function BrainChallenge() {
                         disabled={isDisabled}
                         onClick={() => handlePlayerMove(num)}
                         className={[
-                          'py-2.5 sm:py-3 rounded-lg font-mono text-xs sm:text-sm font-bold border transition-all duration-200 flex flex-col items-center justify-center select-none',
+                          'py-3 sm:py-4 rounded-xl font-mono text-sm sm:text-base font-bold border transition-all duration-200 flex flex-col items-center justify-center select-none',
                           isDisabled
-                            ? 'opacity-30 border-edge/40 bg-bg/20 text-dim cursor-not-allowed'
-                            : 'cursor-pointer border-edge bg-bg/60 text-fg hover:border-accent hover:text-accent hover:bg-accent/5 hover:-translate-y-0.5 active:translate-y-0 shadow-sm hover:shadow-accent/10',
+                            ? 'opacity-30 border-edge/30 bg-surface/10 text-dim cursor-not-allowed'
+                            : 'cursor-pointer border-edge bg-surface/60 text-fg hover:border-accent hover:text-accent hover:bg-accent/10 hover:-translate-y-0.5 active:translate-y-0 shadow-sm',
                         ].join(' ')}
                       >
                         +{num}
@@ -511,122 +523,106 @@ export default function BrainChallenge() {
                   })}
                 </div>
               </div>
-
-              {/* Status footer without any debug controls */}
-              <div className="mt-5 pt-3 border-t border-edge/40 flex items-center justify-between text-[11px] font-mono text-dim">
-                <span>Turn-Based Addition (Target 100)</span>
-                <span>
-                  {isBotThinking
-                    ? 'System is evaluating moves...'
-                    : currentTurn === 'you'
-                    ? 'Your turn to play'
-                    : 'Awaiting system move'}
-                </span>
-              </div>
             </div>
           )}
 
           {/* =========================================================================
-              VIEW 3: RESULT STATE LAYOUT (gameState === 'result')
+              VIEW 3: RESULT STATE (gameState === 'result')
              ========================================================================= */}
           {gameState === 'result' && (
-            <div className="rounded-2xl border border-edge bg-surface/90 backdrop-blur-md p-5 sm:p-7 shadow-2xl transition-all text-center">
-              {/* Outcome Badge & Title */}
-              <div className="mb-4 flex flex-col items-center">
-                {outcome === 'win' ? (
-                  <>
-                    <div className="w-12 h-12 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-mono text-xl font-bold mb-2.5 shadow-lg shadow-emerald-500/10 animate-bounce">
-                      ★
-                    </div>
-                    <span className="font-mono text-[10px] tracking-[0.2em] text-emerald-400 uppercase font-semibold mb-1">
-                      CHALLENGE ACCOMPLISHED
-                    </span>
-                    <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-fg">
-                      Victory! Target 100 Reached
-                    </h2>
-                    <p className="text-dim text-xs sm:text-sm mt-1 max-w-md">
-                      Superior calculation. You landed precisely on the target milestone of 100.
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <div className="w-12 h-12 rounded-full bg-accent/15 border border-accent/40 flex items-center justify-center text-accent font-mono text-xl font-bold mb-2.5 shadow-lg shadow-accent/10">
-                      ✕
-                    </div>
-                    <span className="font-mono text-[10px] tracking-[0.2em] text-accent uppercase font-semibold mb-1">
-                      SYSTEM SECURED TARGET
-                    </span>
-                    <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-fg">
-                      Computer Claimed 100
-                    </h2>
-                    <p className="text-dim text-xs sm:text-sm mt-1 max-w-md">
-                      The opponent seized the critical terminal multiple. Sharpen your next approach.
-                    </p>
-                  </>
-                )}
-              </div>
+            <div className="py-6 sm:py-10 flex flex-col items-center text-center max-w-xl mx-auto">
+              {outcome === 'win' ? (
+                <>
+                  <div className="w-16 h-16 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-mono text-2xl mb-4 shadow-lg shadow-emerald-500/10">
+                    ★
+                  </div>
+                  <span className="font-mono text-xs tracking-widest text-emerald-400 uppercase font-semibold mb-1">
+                    Victory
+                  </span>
+                  <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-fg mb-2">
+                    You Reached 100!
+                  </h2>
+                  <p className="text-dim text-sm sm:text-base max-w-md mb-8">
+                    Well calculated! You landed exactly on 100 before the computer.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="w-16 h-16 rounded-full bg-accent/15 border border-accent/40 flex items-center justify-center text-accent font-mono text-2xl mb-4 shadow-lg shadow-accent/10">
+                    ✕
+                  </div>
+                  <span className="font-mono text-xs tracking-widest text-accent uppercase font-semibold mb-1">
+                    Round Over
+                  </span>
+                  <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-fg mb-2">
+                    Computer Reached 100
+                  </h2>
+                  <p className="text-dim text-sm sm:text-base max-w-md mb-8">
+                    The computer landed on 100 first. Ready to try again?
+                  </p>
+                </>
+              )}
 
-              {/* Game Stats Card with Local Record */}
-              <div className="max-w-md mx-auto my-5 p-3.5 rounded-xl border border-edge bg-bg/50">
-                <div className="grid grid-cols-3 gap-2.5 pb-2.5 border-b border-edge/60">
+              {/* Summary Stats Box */}
+              <div className="w-full p-4 sm:p-5 rounded-xl border border-edge/80 bg-surface/40 backdrop-blur-xs mb-8">
+                <div className="grid grid-cols-3 gap-4 pb-4 border-b border-edge/60 text-center">
                   <div>
-                    <span className="block font-mono text-[9px] text-dim uppercase">FINAL SUM</span>
-                    <span className="font-mono text-lg sm:text-xl font-bold text-accent">100</span>
+                    <span className="block font-mono text-[10px] text-dim uppercase">Total Moves</span>
+                    <span className="font-mono text-base sm:text-lg font-bold text-fg">
+                      {movesHistoryRef.current.length}
+                    </span>
                   </div>
                   <div>
-                    <span className="block font-mono text-[9px] text-dim uppercase">DIFFICULTY</span>
-                    <span className="font-mono text-xs sm:text-sm font-semibold text-fg uppercase">
+                    <span className="block font-mono text-[10px] text-dim uppercase">Difficulty</span>
+                    <span className="font-mono text-base sm:text-lg font-bold text-fg capitalize">
                       {difficulty}
                     </span>
                   </div>
                   <div>
-                    <span className="block font-mono text-[9px] text-dim uppercase">OUTCOME</span>
+                    <span className="block font-mono text-[10px] text-dim uppercase">Outcome</span>
                     <span
                       className={[
-                        'font-mono text-xs sm:text-sm font-semibold uppercase',
+                        'font-mono text-base sm:text-lg font-bold',
                         outcome === 'win' ? 'text-emerald-400' : 'text-accent',
                       ].join(' ')}
                     >
-                      {outcome === 'win' ? 'PLAYER' : 'SYSTEM'}
+                      {outcome === 'win' ? 'Win' : 'Loss'}
                     </span>
                   </div>
                 </div>
 
-                {/* Browser Statistics (localStorage) */}
-                <div className="pt-2 flex items-center justify-between text-[11px] font-mono text-dim">
-                  <span className="uppercase text-[9.5px] tracking-wider text-dim/80">Local Browser Record</span>
+                <div className="pt-3 flex items-center justify-between text-xs font-mono text-dim">
+                  <span>Your Record</span>
                   <div className="flex items-center gap-3">
-                    <span className="text-emerald-400 font-medium">Wins: {browserStats.wins}</span>
-                    <span className="text-accent font-medium">Losses: {browserStats.losses}</span>
+                    <span className="text-emerald-400 font-semibold">{browserStats.wins} Wins</span>
+                    <span className="text-accent font-semibold">{browserStats.losses} Losses</span>
                   </div>
                 </div>
               </div>
 
-              {/* Action Buttons: Play Again & Change Difficulty */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-1">
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center justify-center gap-3">
                 <button
                   type="button"
                   onClick={handlePlayAgain}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 bg-accent hover:bg-accent-h text-white font-medium text-[13px] px-5 py-2.5 rounded-lg transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-lg shadow-accent/20"
+                  className="inline-flex items-center gap-2 bg-accent hover:bg-accent-h text-white font-medium text-sm px-6 py-3 rounded-lg transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer shadow-lg shadow-accent/20"
                 >
                   <span>Play Again</span>
                   <span className="font-mono">↺</span>
                 </button>
-
                 <button
                   type="button"
                   onClick={handleChangeDifficulty}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-dim hover:text-fg border border-edge hover:border-accent/60 font-medium text-[13px] px-4 py-2.5 rounded-lg transition-all duration-200 cursor-pointer bg-surface/60"
+                  className="inline-flex items-center gap-2 text-dim hover:text-fg border border-edge hover:border-accent/60 font-medium text-sm px-5 py-3 rounded-lg transition-all duration-200 cursor-pointer bg-surface/40"
                 >
                   <span>Change Difficulty</span>
                 </button>
-
-                <a
+                <Link
                   href="/"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 text-dim hover:text-fg border border-edge hover:border-edge/90 font-medium text-[13px] px-4 py-2.5 rounded-lg transition-all duration-200 cursor-pointer bg-bg/50"
+                  className="inline-flex items-center gap-2 text-dim hover:text-fg border border-edge/60 hover:border-edge font-medium text-sm px-5 py-3 rounded-lg transition-all duration-200 cursor-pointer"
                 >
-                  <span>Back to RILBIEZ</span>
-                </a>
+                  <span>Back to Home</span>
+                </Link>
               </div>
             </div>
           )}

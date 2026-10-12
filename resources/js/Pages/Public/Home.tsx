@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Head } from '@inertiajs/react';
 import { Lang, copy } from '../../Components/Public/Copy';
 import { Navbar } from '../../Components/Public/Navbar';
 import { HeroSection } from '../../Components/Public/HeroSection';
@@ -24,6 +25,8 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen bg-bg text-fg selection:bg-accent/30 selection:text-white">
+      <Head title="Homepage" />
+
       {/* Cinematic Ambient Background Layer */}
       <BackgroundMotion />
 
