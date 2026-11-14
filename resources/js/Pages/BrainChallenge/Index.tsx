@@ -121,7 +121,7 @@ export default function BrainChallenge() {
 
     setGameState('playing');
   };
-
+  //tes
   // Human player makes a move
   const handlePlayerMove = (num: number) => {
     if (gameState !== 'playing' || currentTurn !== 'you' || isBotThinking) {
@@ -293,7 +293,7 @@ export default function BrainChallenge() {
 
           {/* Right Header: Clean subtle indicator & stats */}
           <div className="flex items-center gap-3">
-            
+
             {(browserStats.wins > 0 || browserStats.losses > 0) && (
               <div className="hidden sm:inline-flex items-center gap-1.5 font-mono text-[11px] text-dim border border-edge/60 px-2.5 py-1 rounded-md">
                 <span className="text-emerald-400 font-medium">{browserStats.wins} Win</span>
