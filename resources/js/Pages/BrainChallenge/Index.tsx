@@ -121,7 +121,7 @@ export default function BrainChallenge() {
 
     setGameState('playing');
   };
-  //tes
+
   // Human player makes a move
   const handlePlayerMove = (num: number) => {
     if (gameState !== 'playing' || currentTurn !== 'you' || isBotThinking) {
